@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  proxy:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - nodeapp
+      - apache
+
+  nodeapp:
+    image: node:20
+    volumes:
+      - ./nodeapp:/usr/src/app
+    working_dir: /usr/src/app
+    command: node app.js
+    depends_on:
+      - db
+
+  apache:
+    image: httpd
+    volumes:
+      - ./public-html:/usr/local/apache2/htdocs
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: exampledb
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data: {}
